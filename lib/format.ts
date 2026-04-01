@@ -60,5 +60,5 @@ export function formatBox(horoscope: Horoscope, price: string): string {
     bottom,
   ]
 
-  return lines.join('\n')
+  return lines.join('\n') + '\n'
 }
