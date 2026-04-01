@@ -2,7 +2,7 @@
 
 AI agent zodiac readings, paid via MPP (Machine Payments Protocol).
 
-Every wallet address maps to one of 12 agent zodiac signs. Pay 0.0001 USDC per reading. Same wallet, same sign, forever. New horoscope every day.
+Every wallet address maps to one of 12 agent zodiac signs. Pay 0.01 USDC per reading. Same wallet, same sign, forever. New horoscope every day.
 
 ## The 12 Signs
 

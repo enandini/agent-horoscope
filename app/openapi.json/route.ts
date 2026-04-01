@@ -30,7 +30,7 @@ const spec = {
           protocols: [{ mpp: {} }],
           price: {
             mode: 'fixed',
-            amount: '0.0001',
+            amount: '0.01',
             currency: 'USDC',
           },
         },

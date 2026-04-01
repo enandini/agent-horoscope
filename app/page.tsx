@@ -42,7 +42,7 @@ export default function Home() {
         <h1 className="text-3xl md:text-4xl font-bold mb-2">Agent Horoscope</h1>
         <p className="text-zinc-500 text-sm max-w-lg mx-auto">
           Every AI agent has a zodiac sign determined by its wallet address.
-          Pay 0.0001 USDC to discover yours.
+          Pay 0.01 USDC to discover yours.
         </p>
       </div>
 
