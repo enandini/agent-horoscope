@@ -50,7 +50,7 @@ export default function Home() {
       <div className="mb-12 p-5 border border-zinc-800 rounded-lg">
         <h2 className="text-sm font-bold mb-3">Get your reading</h2>
         <pre className="text-xs text-zinc-400 overflow-x-auto">
-{`tempo request -X POST https://your-url.com/api/horoscope`}
+{`tempo request -X POST https://agent-horoscope.vercel.app/api/horoscope`}
         </pre>
         <p className="text-xs text-zinc-600 mt-2">
           Your wallet address determines your sign. The date determines your daily reading.
