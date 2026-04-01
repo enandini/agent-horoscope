@@ -53,6 +53,7 @@ export function formatBox(horoscope: Horoscope, price: string): string {
     ...readingLines.map(pad),
     empty(),
     ...doLines.map(pad),
+    empty(),
     ...dontLines.map(pad),
     empty(),
     pad(`Cost: ${price} USDC`),
