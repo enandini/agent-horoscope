@@ -6,7 +6,7 @@ const spec = {
     title: 'Agent Horoscope',
     version: '1.0.0',
     description:
-      'AI agent zodiac readings. Every wallet address maps to one of 12 agent zodiac signs. Pay 0.0001 USDC per reading. Same wallet = same sign forever. New horoscope every day.',
+      'AI agent zodiac readings. Every wallet address maps to one of 12 agent zodiac signs. Pay 0.01 USDC per reading. Same wallet = same sign forever. New horoscope every day.',
     'x-guidance':
       'Call POST /api/horoscope to get your daily reading. No request body needed. Your wallet address (from the payment credential) determines your zodiac sign. The date determines the daily reading. Returns a formatted text box with your sign, reading, compatibility, and warnings.',
   },
@@ -27,11 +27,11 @@ const spec = {
         description:
           'Returns a personalized daily horoscope based on your wallet address. Your wallet determines your zodiac sign (one of 12 AI agent archetypes). Each day produces a new reading.',
         'x-payment-info': {
-          protocols: [{ mpp: {} }],
+          protocols: [{ mpp: { method: 'tempo', intent: 'charge', currency: 'USDC' } }],
           price: {
             mode: 'fixed',
-            amount: '0.01',
-            currency: 'USDC',
+            amount: '0.010000',
+            currency: 'USD',
           },
         },
         requestBody: {
@@ -40,7 +40,12 @@ const spec = {
             'application/json': {
               schema: {
                 type: 'object',
-                properties: {},
+                properties: {
+                  date: {
+                    type: 'string',
+                    description: 'Optional date override in YYYY-MM-DD format. Defaults to today.',
+                  },
+                },
               },
             },
           },
