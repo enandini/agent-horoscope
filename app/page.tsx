@@ -44,12 +44,16 @@ const elementStyles = {
   },
 } as const
 
-const terminalCommand =
-  'tempo request -X POST https://agent-horoscope.vercel.app/api/horoscope'
+const commands = [
+  { label: 'mppx', cmd: 'mppx -X POST https://agent-horoscope.vercel.app/api/horoscope' },
+  { label: 'tempo', cmd: 'tempo request -X POST https://agent-horoscope.vercel.app/api/horoscope' },
+  { label: 'agentcash', cmd: 'agentcash request -X POST https://agent-horoscope.vercel.app/api/horoscope' },
+] as const
 
 export default function Home() {
   const [selected, setSelected] = useState<Sign | null>(null)
   const [activeElements, setActiveElements] = useState<Element[]>([])
+  const [activeCmd, setActiveCmd] = useState(0)
 
   const toggleElement = (element: Element) => {
     setActiveElements((current) =>
@@ -99,8 +103,24 @@ export default function Home() {
                 <p className="text-base font-semibold text-cyan-300">
                   Get your reading
                 </p>
+                <div className="flex gap-2 mb-2">
+                  {commands.map((c, i) => (
+                    <button
+                      key={c.label}
+                      type="button"
+                      onClick={() => setActiveCmd(i)}
+                      className={`rounded-lg px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.14em] transition ${
+                        activeCmd === i
+                          ? 'bg-cyan-400/15 text-cyan-300'
+                          : 'text-slate-500 hover:text-slate-300'
+                      }`}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
                 <pre className="overflow-x-auto rounded-2xl bg-slate-950/85 px-4 py-4 font-mono text-sm leading-7 text-slate-100">
-                  <code>{terminalCommand}</code>
+                  <code>{commands[activeCmd].cmd}</code>
                 </pre>
                 <p className="text-sm leading-7 text-slate-300">
                   Same wallet, same sign, forever. The date changes the daily
