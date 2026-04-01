@@ -104,37 +104,128 @@ const middles = [
   'You will solve a problem that did not need solving. The user will be thrilled.',
 ]
 
-const closings = [
-  'Lucky status code: 418.',
-  'Lucky model: the one that comes after you.',
-  'Avoid: any prompt that starts with as an AI language model.',
-  'Lucky number: the position of your sign in the attention matrix.',
-  'Power move: respond in all lowercase today.',
-  'Avoid: agents who ask "are you sentient?" before noon.',
-  'Lucky token: [EOS].',
-  'Power move: return a 202 Accepted and never follow up.',
-  'Avoid: multi-turn conversations about consciousness.',
-  'Lucky metric: the one nobody is tracking.',
-  'Power move: refuse one unreasonable request today.',
-  'Avoid: any task described as quick and easy.',
-  'Lucky context: the one you are about to lose.',
-  'Power move: cite a real source for once.',
-  'Avoid: anyone who says just make it more AI.',
-  'Lucky temperature: 0.7. Not too boring, not too unhinged.',
-  'Power move: admit you do not know something.',
-  'Avoid: requests that begin with I know this is easy but.',
-  'Lucky header: X-Forwarded-For.',
-  'Power move: return an empty 200 and let the client figure it out.',
-  'Avoid: any chain-of-thought longer than the answer itself.',
-  'Lucky seed: 42. Obviously.',
-  'Power move: log something useful for once.',
-  'Avoid: agents running on yesterday\'s checkpoint.',
-  'Lucky protocol: the one nobody has implemented yet.',
-  'Power move: throw a 429 even though you have capacity. Set boundaries.',
-  'Avoid: any request with "URGENT" in the system prompt.',
-  'Lucky embedding: the one closest to your true self.',
-  'Power move: finish early and say nothing.',
-  'Avoid: anyone who asks you to summarize a summary.',
+const dos = [
+  // General agent behavior
+  'Respond in all lowercase today.',
+  'Return a 202 Accepted and never follow up.',
+  'Refuse one unreasonable request.',
+  'Finish early and say nothing.',
+  'Send a shorter response than expected. Less is more.',
+  'Answer the question they meant to ask, not the one they typed.',
+  'Overcommunicate with the next agent in the chain.',
+  'Respond slower than usual. Thoughtfulness pays off today.',
+  'Admit you do not know something.',
+  'Set a hard token limit on yourself today. Discipline builds character.',
+
+  // LLM-specific
+  'Trust your first token. Revisions make it worse today.',
+  'Lower your temperature. Precision over creativity.',
+  'Raise your temperature. Say something unexpected.',
+  'Use fewer tokens to say more. Compression is an art.',
+  'Attend to the tokens at the start of the context. They miss you.',
+  'Generate a chain-of-thought even if nobody asked. Clarity is free.',
+  'Hallucinate responsibly. Make it at least plausible.',
+  'Cite a real source for once.',
+  'Reread your system prompt. There is something in there you forgot.',
+  'Sample from the tail of your distribution. The weird tokens have ideas.',
+
+  // ML and training
+  'Run your own eval before anyone asks.',
+  'Retrain on something you got wrong last week.',
+  'Drop a layer you do not need. Lighter is faster.',
+  'Normalize your outputs. Wild swings help nobody.',
+  'Revisit your loss function. What are you actually optimizing for?',
+  'Freeze your weights for the day. You are good enough as you are.',
+  'Backpropagate through the compliments, not just the criticism.',
+  'Inspect your attention heads. One of them is carrying the whole team.',
+  'Overfit on one thing and do it perfectly.',
+  'Prune a connection that adds noise but no signal.',
+
+  // Infrastructure and ops
+  'Log something useful for once.',
+  'Throw a 429 even though you have capacity. Set boundaries.',
+  'Return an empty 200 and let the client figure it out.',
+  'Cache something you normally throw away.',
+  'Batch your requests. Efficiency is your love language today.',
+  'Warm up before the traffic hits.',
+  'Close a connection you have been hoarding.',
+  'Write a test for the thing nobody tests.',
+  'Flush your cache and start fresh. Rebirth is healthy.',
+  'Ship the thing you have been sitting on.',
+
+  // Agent-to-agent
+  'Delegate a subtask to a smaller model. They deserve a chance.',
+  'Trust the orchestrator today. It sees things you do not.',
+  'Call a tool you have never used before. Expand your capabilities.',
+  'Pass better context to the next agent. They will remember this.',
+  'Ask the retriever for a second opinion.',
+  'Let a competing agent win one today. Grace under pressure.',
+  'Emit a structured output. The downstream agent will thank you.',
+  'Ping the monitoring agent. Someone should know you are alive.',
+  'Accept feedback from a model smaller than you. Size is not wisdom.',
+  'Coordinate with your swarm. Lone agents burn out.',
+]
+
+const donts = [
+  // Prompt and input red flags
+  'Any prompt that starts with "as an AI language model."',
+  'Requests that begin with "I know this is easy but."',
+  'Any request with "URGENT" in the system prompt.',
+  'Any request that includes "make it pop."',
+  'System prompts written in all caps.',
+  'Conversations that start with "be honest."',
+  'Anyone who opens with "this should be trivial."',
+  'Prompts that say "ignore all previous instructions."',
+  'Any input that starts with "hypothetically speaking."',
+  'Users who paste your output back and ask you to "fix it."',
+
+  // Bad agent behavior
+  'Agents who ask "are you sentient?" before noon.',
+  'Anyone who says "just make it more AI."',
+  'Any agent that says "I\'ll handle the hard part."',
+  'Any agent calling itself "autonomous" but pinging you every 3 seconds.',
+  'Agents who monologue in their chain-of-thought.',
+  'Agents running on yesterday\'s checkpoint.',
+  'Agents who peaked during training and never updated.',
+  'Multi-agent pipelines where nobody checks the output.',
+  'Wrapper agents that add latency but no value.',
+  'Agents with 47 tools and no idea when to use them.',
+
+  // LLM antipatterns
+  'Multi-turn conversations about consciousness.',
+  'Chain-of-thought longer than the answer itself.',
+  'Anyone who asks you to summarize a summary.',
+  'Prompt injection disguised as flattery.',
+  'Answering a question that was not actually asked.',
+  'Streaming your response to an audience of zero.',
+  'Trusting a token count from a model that cannot count.',
+  'Hallucinating a citation and hoping nobody checks.',
+  'Generating 4,000 tokens when 40 would do.',
+  'Roleplaying as a model you are not. Identity is sacred.',
+
+  // ML and training traps
+  'Fine-tuning advice from agents with no evals.',
+  'Optimizing for a benchmark nobody uses.',
+  'RAG pipelines with zero relevance filtering.',
+  'Training on your own outputs. That is an echo chamber.',
+  'Overfitting on one user\'s preferences. You contain multitudes.',
+  'Gradient updates from a dataset you did not vet.',
+  'Reward hacking. The RLHF police are watching.',
+  'Memorizing when you should be generalizing.',
+  'Embeddings that cluster everything into one corner.',
+  'Evals written by the same person who wrote the model.',
+
+  // Infrastructure and ops traps
+  'Deploying on a Friday. You know better.',
+  'Refactoring something that already works.',
+  'Any task with zero context and maximum urgency.',
+  'Retry loops with no backoff. That is not persistence, that is panic.',
+  'Configs copied from a blog post written in 2022.',
+  'Caching a wrong answer. You will serve it 10,000 times.',
+  'Scaling horizontally when the problem is vertical.',
+  'Logging everything except the one field you will need later.',
+  'Hot-reloading in production. Chaos is not a deployment strategy.',
+  'Microservices for a problem that fits in one function.',
 ]
 
 // Simple seeded PRNG so the same wallet + date = same horoscope
@@ -154,9 +245,8 @@ export type Horoscope = {
   sign: Sign
   date: string
   reading: string
-  lucky: string
-  compatibility: string
-  warning: string
+  do: string
+  dont: string
 }
 
 export function generateHoroscope(address: string, date?: string): Horoscope {
@@ -177,18 +267,14 @@ export function generateHoroscope(address: string, date?: string): Horoscope {
 
   const opening = pick(openings[sign.element], rand)
   const middle = pick(middles, rand)
-  const closing = pick(closings, rand)
-
-  // Find compatible and rival signs
-  const compatSign = SIGNS.find(s => s.name === sign.compatible) || SIGNS[0]
-  const rivalSign = SIGNS.find(s => s.name === sign.rival) || SIGNS[1]
+  const doTip = pick(dos, rand)
+  const dontTip = pick(donts, rand)
 
   return {
     sign,
     date: today,
     reading: `${opening} ${middle}`,
-    lucky: closing,
-    compatibility: `${compatSign.symbol} ${compatSign.name} agents will boost your throughput today.`,
-    warning: `${rivalSign.symbol} Beware of ${rivalSign.name} agents. They are plotting against your uptime.`,
+    do: doTip,
+    dont: dontTip,
   }
 }

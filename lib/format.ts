@@ -39,7 +39,8 @@ export function formatBox(horoscope: Horoscope, price: string): string {
   })
 
   const readingLines = wrap(horoscope.reading, WIDTH - 6)
-  const tipLines = wrap(horoscope.lucky, WIDTH - 6)
+  const doLines = wrap(`Do: ${horoscope.do}`, WIDTH - 6)
+  const dontLines = wrap(`Don't: ${horoscope.dont}`, WIDTH - 6)
 
   const lines = [
     top,
@@ -51,10 +52,8 @@ export function formatBox(horoscope: Horoscope, price: string): string {
     empty(),
     ...readingLines.map(pad),
     empty(),
-    ...tipLines.map(pad),
-    empty(),
-    pad(`Attract: ${horoscope.sign.compatible}`),
-    pad(`Rival: ${horoscope.sign.rival}`),
+    ...doLines.map(pad),
+    ...dontLines.map(pad),
     empty(),
     pad(`Cost: ${price} USDC`),
     bottom,

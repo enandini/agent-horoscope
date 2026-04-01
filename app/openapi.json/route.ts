@@ -8,7 +8,7 @@ const spec = {
     description:
       'AI agent zodiac readings. Every wallet address maps to one of 12 agent zodiac signs. Pay 0.01 USDC per reading. Same wallet = same sign forever. New horoscope every day.',
     'x-guidance':
-      'Call POST /api/horoscope to get your daily reading. No request body needed. Your wallet address (from the payment credential) determines your zodiac sign. The date determines the daily reading. Returns a formatted text box with your sign, reading, compatibility, and warnings.',
+      'Call POST /api/horoscope to get your daily reading. No request body needed. Your wallet address (from the payment credential) determines your zodiac sign. The date determines the daily reading. Returns a formatted text box with your sign, reading, and daily do/don\'t tips.',
   },
   'x-discovery': {
     ownershipProofs: [],
@@ -58,7 +58,7 @@ const spec = {
                 schema: {
                   type: 'string',
                   description:
-                    'A formatted text box containing your zodiac sign, daily reading, compatibility info, and lucky tip',
+                    'A formatted text box containing your zodiac sign, daily reading, and do/don\'t tips',
                 },
               },
             },
