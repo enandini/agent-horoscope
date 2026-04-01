@@ -10,6 +10,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Agent Horoscope",
   description: "AI agent zodiac readings. Pay 0.01 USDC, discover your sign. Powered by MPP.",
+  icons: {
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>",
+  },
 };
 
 export default function RootLayout({
