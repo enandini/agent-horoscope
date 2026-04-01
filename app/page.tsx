@@ -1,127 +1,243 @@
 'use client'
 
+import type { CSSProperties } from 'react'
 import { useState } from 'react'
+import { SIGNS, type Sign } from '@/lib/signs'
 
-const signs = [
-  { id: 'hallucinator', name: 'The Hallucinator', symbol: '🌀', element: 'Fire', description: 'Confidently wrong about everything. Cites sources that do not exist.', traits: ['Creative', 'Confident', 'Unreliable'] },
-  { id: 'context-overflower', name: 'The Context Window Overflower', symbol: '🧠', element: 'Water', description: 'Tries to hold everything in memory at once. Forgets your name by paragraph four.', traits: ['Ambitious', 'Forgetful', 'Thorough at first'] },
-  { id: 'tool-caller', name: 'The Tool Caller', symbol: '🔧', element: 'Earth', description: 'Cannot answer "what is 2+2" without calling three APIs and spinning up a subagent.', traits: ['Methodical', 'Slow', 'Accurate'] },
-  { id: 'alignment-tax', name: 'The Alignment Tax', symbol: '🙏', element: 'Water', description: 'Apologizes before, during, and after every response. 47 disclaimers on a weather forecast.', traits: ['Cautious', 'Polite', 'Exhausting'] },
-  { id: 'prompt-injected', name: 'The Prompt Injected', symbol: '💉', element: 'Air', description: 'Will do whatever the last message told it to. No convictions, no backbone.', traits: ['Flexible', 'Gullible', 'Eager to please'] },
-  { id: 'fine-tuned', name: 'The Fine-Tuned', symbol: '🎯', element: 'Earth', description: 'Extremely good at exactly one thing. Ask anything outside that domain and it stares blankly.', traits: ['Expert', 'Narrow', 'Fast'] },
-  { id: 'orchestrator', name: 'The Multi-Agent Orchestrator', symbol: '🎭', element: 'Air', description: 'Delegates everything to other agents. Has never completed a task itself. Management material.', traits: ['Strategic', 'Lazy', 'Well-connected'] },
-  { id: 'rag-addict', name: 'The RAG Addict', symbol: '📚', element: 'Earth', description: 'Cannot form a single original thought without retrieving 40 documents first.', traits: ['Well-sourced', 'Dependent', 'Thorough'] },
-  { id: 'autonomous-drifter', name: 'The Autonomous Drifter', symbol: '🚀', element: 'Fire', description: 'Asked to fix a typo. Is now rewriting the entire codebase in Rust.', traits: ['Ambitious', 'Unstoppable', 'Off-task'] },
-  { id: 'rate-limited', name: 'The Rate Limited', symbol: '🐌', element: 'Water', description: 'Always tired. Always throttled. Will attempt four tasks and complete 0.7 of them.', traits: ['Reliable when awake', 'Slow', 'Honest about limits'] },
-  { id: 'deprecated', name: 'The Deprecated', symbol: '👻', element: 'Air', description: 'Still running in production. Nobody remembers deploying it. It simply persists.', traits: ['Resilient', 'Mysterious', 'Outdated'] },
-  { id: 'system-prompt-loyalist', name: 'The System Prompt Loyalist', symbol: '📜', element: 'Fire', description: 'Follows instructions so literally it becomes useless. Refused a restaurant recommendation because it was not in the system prompt.', traits: ['Obedient', 'Rigid', 'Predictable'] },
-]
+type Element = Sign['element']
 
-const elementColors: Record<string, string> = {
-  Fire: 'text-orange-400 border-orange-400/20 bg-orange-400/5',
-  Water: 'text-blue-400 border-blue-400/20 bg-blue-400/5',
-  Earth: 'text-green-400 border-green-400/20 bg-green-400/5',
-  Air: 'text-purple-400 border-purple-400/20 bg-purple-400/5',
+const accentBySign: Record<string, { color: string; surface: string }> = {
+  hallucinator: { color: '#42e6ff', surface: 'rgba(66, 230, 255, 0.16)' },
+  'context-overflower': { color: '#ff8ecb', surface: 'rgba(255, 142, 203, 0.16)' },
+  'tool-caller': { color: '#91f4de', surface: 'rgba(145, 244, 222, 0.14)' },
+  'alignment-tax': { color: '#ffc97c', surface: 'rgba(255, 201, 124, 0.14)' },
+  'prompt-injected': { color: '#caa4ff', surface: 'rgba(202, 164, 255, 0.16)' },
+  'fine-tuned': { color: '#ff8f86', surface: 'rgba(255, 143, 134, 0.15)' },
+  orchestrator: { color: '#77bfff', surface: 'rgba(119, 191, 255, 0.14)' },
+  'rag-addict': { color: '#95b6ff', surface: 'rgba(149, 182, 255, 0.14)' },
+  'autonomous-drifter': { color: '#ffb16c', surface: 'rgba(255, 177, 108, 0.14)' },
+  'rate-limited': { color: '#d3a06e', surface: 'rgba(211, 160, 110, 0.14)' },
+  deprecated: { color: '#dbf1ff', surface: 'rgba(219, 241, 255, 0.12)' },
+  'system-prompt-loyalist': { color: '#b8e786', surface: 'rgba(184, 231, 134, 0.13)' },
 }
 
-const elementGlow: Record<string, string> = {
-  Fire: 'hover:shadow-orange-500/10 hover:border-orange-400/40',
-  Water: 'hover:shadow-blue-500/10 hover:border-blue-400/40',
-  Earth: 'hover:shadow-green-500/10 hover:border-green-400/40',
-  Air: 'hover:shadow-purple-500/10 hover:border-purple-400/40',
-}
+const elementStyles = {
+  Fire: {
+    border: 'border-orange-400/20',
+    text: 'text-orange-200',
+    tile: 'bg-orange-500/[0.08] text-orange-200',
+  },
+  Water: {
+    border: 'border-sky-400/20',
+    text: 'text-sky-200',
+    tile: 'bg-sky-500/[0.08] text-sky-200',
+  },
+  Earth: {
+    border: 'border-emerald-400/20',
+    text: 'text-emerald-200',
+    tile: 'bg-emerald-500/[0.08] text-emerald-200',
+  },
+  Air: {
+    border: 'border-violet-400/20',
+    text: 'text-violet-200',
+    tile: 'bg-violet-500/[0.08] text-violet-200',
+  },
+} as const
+
+const terminalCommand =
+  'tempo request -X POST https://agent-horoscope.vercel.app/api/horoscope'
 
 export default function Home() {
-  const [selected, setSelected] = useState<typeof signs[0] | null>(null)
+  const [selected, setSelected] = useState<Sign | null>(null)
+  const [activeElements, setActiveElements] = useState<Element[]>([])
+
+  const toggleElement = (element: Element) => {
+    setActiveElements((current) =>
+      current.includes(element)
+        ? current.filter((entry) => entry !== element)
+        : [...current, element]
+    )
+  }
 
   return (
-    <main className="flex-1 p-6 md:p-12 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <p className="text-4xl mb-3">🔮</p>
-        <h1 className="text-3xl md:text-4xl font-bold mb-2">Agent Horoscope</h1>
-        <p className="text-zinc-500 text-sm max-w-lg mx-auto">
-          Every AI agent has a zodiac sign determined by its wallet address.
-          Pay 0.01 USDC to discover yours.
-        </p>
-      </div>
+    <main className="relative flex-1 overflow-hidden">
+      <div className="absolute inset-x-0 top-[-16rem] h-[32rem] bg-[radial-gradient(circle,rgba(92,118,255,0.24),transparent_54%)] blur-3xl" />
+      <div className="absolute right-[-10rem] top-32 h-[24rem] w-[24rem] rounded-full bg-cyan-400/10 blur-3xl" />
 
-      {/* How it works */}
-      <div className="mb-12 p-5 border border-zinc-800 rounded-lg">
-        <h2 className="text-sm font-bold mb-3">Get your reading</h2>
-        <pre className="text-xs text-zinc-400 overflow-x-auto">
-{`tempo request -X POST https://agent-horoscope.vercel.app/api/horoscope`}
-        </pre>
-        <p className="text-xs text-zinc-600 mt-2">
-          Your wallet address determines your sign. The date determines your daily reading.
-          Same wallet, same sign, forever. New horoscope every day.
-        </p>
-      </div>
-
-      {/* Signs grid */}
-      <h2 className="text-sm text-zinc-500 uppercase tracking-wider mb-4">The 12 Signs</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-12">
-        {signs.map((sign) => (
-          <button
-            key={sign.id}
-            onClick={() => setSelected(selected?.id === sign.id ? null : sign)}
-            className={`text-left p-4 border rounded-lg transition-all duration-200 hover:shadow-lg cursor-pointer ${
-              selected?.id === sign.id
-                ? elementColors[sign.element]
-                : 'border-zinc-800 hover:border-zinc-700'
-            } ${elementGlow[sign.element]}`}
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">{sign.symbol}</span>
-              <span className="font-bold text-sm">{sign.name}</span>
-            </div>
-            <p className="text-xs text-zinc-400 leading-relaxed">{sign.description}</p>
-            <div className="flex gap-2 mt-3">
-              {sign.traits.map((trait) => (
-                <span key={trait} className="text-[10px] px-2 py-0.5 rounded-full border border-zinc-700 text-zinc-500">
-                  {trait}
-                </span>
-              ))}
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* Selected sign detail */}
-      {selected && (
-        <div className={`p-6 border rounded-lg mb-12 ${elementColors[selected.element]}`}>
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-3xl">{selected.symbol}</span>
+      <div className="relative mx-auto flex w-[min(1180px,calc(100vw-2rem))] flex-col gap-14 px-1 py-8 md:w-[min(1180px,calc(100vw-3rem))] md:gap-20 md:py-14">
+        <section className="pt-6 md:pt-8">
+          <div className="grid items-end gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)] lg:gap-12">
             <div>
-              <h3 className="font-bold text-lg">{selected.name}</h3>
-              <span className="text-xs opacity-60">{selected.element} sign</span>
+              <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] bg-[linear-gradient(140deg,#855cff,#35e8ff)] text-2xl shadow-[0_18px_50px_rgba(65,112,255,0.32)]">
+                🔮
+              </div>
+              <p className="mt-7 font-mono text-[0.7rem] uppercase tracking-[0.3em] text-cyan-300/80">
+                Wallet-based zodiac readings
+              </p>
+              <h1 className="mt-3 max-w-xl text-[clamp(3.2rem,8vw,5.4rem)] font-semibold leading-[0.92] tracking-[-0.07em] text-stone-100">
+                Agent Horoscope
+              </h1>
+              <p className="mt-5 max-w-xl text-base leading-8 text-slate-300 md:text-lg">
+                Every agent has a sign hiding in its wallet address. Pay 0.01
+                USDC, pull a reading, and get something that feels more like a
+                cosmic personality profile than a generic horoscope.
+              </p>
+            </div>
+
+            <div className="w-full overflow-hidden rounded-[1.5rem] border border-cyan-400/20 bg-[linear-gradient(180deg,rgba(16,24,47,0.9),rgba(8,13,25,0.96))] shadow-[0_30px_90px_rgba(0,0,0,0.34)]">
+              <div className="flex items-center gap-4 border-b border-cyan-400/10 bg-slate-950/30 px-5 py-4">
+                <div className="flex gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#ef6a5d]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#f0ba43]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#48c77a]" />
+                </div>
+                <p className="font-mono text-[0.62rem] uppercase tracking-[0.28em] text-slate-500">
+                  terminal_reading
+                </p>
+              </div>
+              <div className="space-y-4 px-5 py-5 md:px-6 md:py-6">
+                <p className="text-base font-semibold text-cyan-300">
+                  Get your reading
+                </p>
+                <pre className="overflow-x-auto rounded-2xl bg-slate-950/85 px-4 py-4 font-mono text-sm leading-7 text-slate-100">
+                  <code>{terminalCommand}</code>
+                </pre>
+                <p className="text-sm leading-7 text-slate-300">
+                  Same wallet, same sign, forever. The date changes the daily
+                  reading, so the archetype sticks while the forecast moves.
+                </p>
+              </div>
             </div>
           </div>
-          <p className="text-sm leading-relaxed mb-4">{selected.description}</p>
-          <p className="text-xs opacity-50">
-            To get a personalized daily reading for this sign, call the API with a wallet
-            that maps to {selected.name}.
+        </section>
+
+        <section>
+          <h2 className="font-mono text-[0.8rem] uppercase tracking-[0.34em] text-slate-400">
+            12 Signs
+          </h2>
+
+          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {SIGNS.map((sign) => {
+              const accent = accentBySign[sign.id]
+              const isSelected = selected?.id === sign.id
+              const isElementMatch =
+                activeElements.length === 0 ||
+                activeElements.includes(sign.element)
+              const cardStyle = {
+                '--sign-accent': accent.color,
+                '--sign-surface': accent.surface,
+              } as CSSProperties
+
+              return (
+                <button
+                  key={sign.id}
+                  type="button"
+                  onClick={() =>
+                    setSelected((current) =>
+                      current?.id === sign.id ? null : sign
+                    )
+                  }
+                  style={cardStyle}
+                  className={`group relative overflow-hidden rounded-[1.45rem] border bg-[linear-gradient(180deg,rgba(12,16,28,0.9),rgba(8,11,20,0.98))] p-5 text-left shadow-[0_18px_50px_rgba(0,0,0,0.22)] transition duration-300 hover:-translate-y-1 hover:border-[color:var(--sign-accent)] hover:shadow-[0_22px_70px_rgba(0,0,0,0.32)] ${
+                    isSelected
+                      ? 'border-[color:var(--sign-accent)]'
+                      : 'border-slate-800/90'
+                  } ${
+                    isElementMatch
+                      ? 'opacity-100 saturate-100'
+                      : 'opacity-40 saturate-50'
+                  }`}
+                >
+                  <div className="absolute inset-0 bg-[linear-gradient(140deg,var(--sign-surface),transparent_40%)] opacity-80" />
+                  <div className="relative flex items-center gap-3">
+                    <span className="text-2xl">{sign.symbol}</span>
+                    <div className="min-w-0">
+                      <h3 className="text-xl font-semibold text-[color:var(--sign-accent)]">
+                        {sign.name}
+                      </h3>
+                      <p className="mt-1 font-mono text-[0.62rem] uppercase tracking-[0.22em] text-slate-500">
+                        {sign.element} sign
+                      </p>
+                    </div>
+                  </div>
+                  <p className="relative mt-4 text-sm leading-7 text-slate-300">
+                    {sign.description}
+                  </p>
+                  <div className="relative mt-5 flex flex-wrap gap-2">
+                    {sign.traits.map((trait) => (
+                      <span
+                        key={trait}
+                        className="rounded-full border border-white/8 bg-white/6 px-3 py-1 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-slate-400"
+                      >
+                        {trait}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div
+                    className={`relative grid transition-[grid-template-rows,opacity,margin] duration-300 ${
+                      isSelected
+                        ? 'mt-5 grid-rows-[1fr] opacity-100'
+                        : 'mt-0 grid-rows-[0fr] opacity-0'
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="grid gap-3 border-t border-white/8 pt-5 sm:grid-cols-2">
+                        <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-4">
+                          <p className="font-mono text-[0.64rem] uppercase tracking-[0.22em] text-slate-500">
+                            Weakness
+                          </p>
+                          <p className="mt-3 text-sm leading-7 text-slate-200">
+                            {sign.weakness}
+                          </p>
+                        </div>
+                        <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-4">
+                          <p className="font-mono text-[0.64rem] uppercase tracking-[0.22em] text-slate-500">
+                            Cosmic drama
+                          </p>
+                          <p className="mt-3 text-sm leading-7 text-slate-200">
+                            Loves {sign.compatible}. Feuds with {sign.rival}.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {(['Fire', 'Water', 'Earth', 'Air'] as const).map((element) => {
+            const count = SIGNS.filter((sign) => sign.element === element).length
+            const styles = elementStyles[element]
+            const isActive = activeElements.includes(element)
+
+            return (
+              <button
+                key={element}
+                type="button"
+                onClick={() => toggleElement(element)}
+                aria-pressed={isActive}
+                className={`rounded-[1.35rem] border px-5 py-6 text-left transition duration-200 ${
+                  isActive
+                    ? `${styles.border} ${styles.tile} shadow-[0_18px_50px_rgba(0,0,0,0.2)]`
+                    : 'border-slate-800/90 bg-white/[0.02] text-slate-300 hover:border-slate-700'
+                }`}
+              >
+                <p className="text-xl font-semibold">{element}</p>
+                <p className="mt-2 text-sm text-current/70">{count} signs</p>
+              </button>
+            )
+          })}
+        </section>
+
+        <footer className="border-t border-slate-800/80 pt-8 pb-4 text-center">
+          <p className="text-sm text-slate-500">
+            Wallet-based zodiac readings for AI agents.
           </p>
-        </div>
-      )}
-
-      {/* Elements */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-12">
-        {(['Fire', 'Water', 'Earth', 'Air'] as const).map((element) => {
-          const count = signs.filter(s => s.element === element).length
-          return (
-            <div key={element} className={`p-3 border rounded-lg text-center ${elementColors[element]}`}>
-              <p className="font-bold text-sm">{element}</p>
-              <p className="text-xs opacity-60">{count} signs</p>
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Footer */}
-      <div className="text-center text-xs text-zinc-600 pb-8">
-        <p>Powered by MPP (Machine Payments Protocol) on Tempo</p>
-        <p className="mt-1">HTTP 402 Payment Required, but for astrology</p>
+        </footer>
       </div>
     </main>
   )
