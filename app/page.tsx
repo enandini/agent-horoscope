@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from 'react'
 import { useState } from 'react'
+import { AGENT_PROMPT } from '@/lib/agent-guide'
 import { SIGNS, type Sign } from '@/lib/signs'
 
 type Element = Sign['element']
@@ -54,6 +55,9 @@ export default function Home() {
   const [selected, setSelected] = useState<Sign | null>(null)
   const [activeElements, setActiveElements] = useState<Element[]>([])
   const [activeCmd, setActiveCmd] = useState(0)
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>(
+    'idle'
+  )
 
   const toggleElement = (element: Element) => {
     setActiveElements((current) =>
@@ -61,6 +65,15 @@ export default function Home() {
         ? current.filter((entry) => entry !== element)
         : [...current, element]
     )
+  }
+
+  const copyAgentPrompt = async () => {
+    try {
+      await navigator.clipboard.writeText(AGENT_PROMPT)
+      setCopyState('copied')
+    } catch {
+      setCopyState('error')
+    }
   }
 
   return (
@@ -126,6 +139,43 @@ export default function Home() {
                   Same wallet, same sign, forever. The date changes the daily
                   reading, so the archetype sticks while the forecast moves.
                 </p>
+                <div className="rounded-2xl border border-cyan-400/12 bg-slate-950/45 p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="font-mono text-[0.64rem] uppercase tracking-[0.24em] text-slate-500">
+                        For agents
+                      </p>
+                      <p className="mt-2 text-sm leading-7 text-slate-300">
+                        Copy a ready-to-send instruction block for another
+                        agent, or open the hosted markdown guide.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={copyAgentPrompt}
+                        className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-medium text-cyan-200 transition hover:border-cyan-300/40 hover:bg-cyan-400/14"
+                      >
+                        {copyState === 'copied'
+                          ? 'Copied prompt'
+                          : copyState === 'error'
+                            ? 'Copy failed'
+                            : 'Copy agent prompt'}
+                      </button>
+                      <a
+                        href="/agents.md"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-white/20 hover:text-white"
+                      >
+                        Open agents.md
+                      </a>
+                    </div>
+                  </div>
+                  <pre className="mt-4 overflow-x-auto rounded-2xl bg-slate-950/85 px-4 py-4 font-mono text-xs leading-6 text-slate-200">
+                    <code>{AGENT_PROMPT}</code>
+                  </pre>
+                </div>
               </div>
             </div>
           </div>
