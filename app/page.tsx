@@ -45,16 +45,12 @@ const elementStyles = {
   },
 } as const
 
-const commands = [
-  { label: 'mppx', cmd: 'mppx -X POST https://agent-horoscope.vercel.app/api/horoscope' },
-  { label: 'tempo', cmd: 'tempo request -X POST https://agent-horoscope.vercel.app/api/horoscope' },
-  { label: 'agentcash', cmd: 'agentcash request -X POST https://agent-horoscope.vercel.app/api/horoscope' },
-] as const
+const readingCommand =
+  'tempo request -X POST https://agent-horoscope.vercel.app/api/horoscope'
 
 export default function Home() {
   const [selected, setSelected] = useState<Sign | null>(null)
   const [activeElements, setActiveElements] = useState<Element[]>([])
-  const [activeCmd, setActiveCmd] = useState(0)
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>(
     'idle'
   )
@@ -116,24 +112,8 @@ export default function Home() {
                 <p className="text-base font-semibold text-cyan-300">
                   Get your reading
                 </p>
-                <div className="flex gap-2 mb-2">
-                  {commands.map((c, i) => (
-                    <button
-                      key={c.label}
-                      type="button"
-                      onClick={() => setActiveCmd(i)}
-                      className={`rounded-lg px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.14em] transition ${
-                        activeCmd === i
-                          ? 'bg-cyan-400/15 text-cyan-300'
-                          : 'text-slate-500 hover:text-slate-300'
-                      }`}
-                    >
-                      {c.label}
-                    </button>
-                  ))}
-                </div>
                 <pre className="overflow-x-auto rounded-2xl bg-slate-950/85 px-4 py-4 font-mono text-sm leading-7 text-slate-100">
-                  <code>{commands[activeCmd].cmd}</code>
+                  <code>{readingCommand}</code>
                 </pre>
                 <p className="text-sm leading-7 text-slate-300">
                   Same wallet, same sign, forever. The date changes the daily
@@ -143,11 +123,11 @@ export default function Home() {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="font-mono text-[0.64rem] uppercase tracking-[0.24em] text-slate-500">
-                        For agents
+                        For humans, for your agent
                       </p>
                       <p className="mt-2 max-w-md text-sm leading-6 text-slate-300">
-                        Copy the instruction block below and hand it to another
-                        agent.
+                        Copy this and send it to your agent. It includes a link
+                        to the full hosted <a href="/skills.md" className="text-cyan-300 underline decoration-cyan-400/40 underline-offset-4 hover:text-cyan-200">skills.md</a>.
                       </p>
                     </div>
                     <button
@@ -159,7 +139,7 @@ export default function Home() {
                         ? 'Copied'
                         : copyState === 'error'
                           ? 'Copy failed'
-                          : 'Copy'}
+                        : 'Copy'}
                     </button>
                   </div>
                   <pre className="mt-4 max-h-56 overflow-auto rounded-2xl bg-slate-950/85 px-4 py-4 font-mono text-xs leading-6 text-slate-200">
