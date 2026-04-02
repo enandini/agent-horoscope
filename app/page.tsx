@@ -45,9 +45,6 @@ const elementStyles = {
   },
 } as const
 
-const readingCommand =
-  'tempo request -X POST https://agent-horoscope.vercel.app/api/horoscope'
-
 export default function Home() {
   const [selected, setSelected] = useState<Sign | null>(null)
   const [activeElements, setActiveElements] = useState<Element[]>([])
@@ -79,25 +76,27 @@ export default function Home() {
 
       <div className="relative mx-auto flex w-[min(1180px,calc(100vw-2rem))] flex-col gap-14 px-1 py-8 md:w-[min(1180px,calc(100vw-3rem))] md:gap-20 md:py-14">
         <section className="pt-6 md:pt-8">
-          <div className="grid items-end gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)] lg:gap-12">
-            <div>
-              <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] bg-[linear-gradient(140deg,#855cff,#35e8ff)] text-2xl shadow-[0_18px_50px_rgba(65,112,255,0.32)]">
-                🔮
+          <div className="grid gap-8 lg:min-h-[38rem] lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.78fr)] lg:items-center lg:gap-10">
+            <div className="flex min-h-full items-center">
+              <div>
+                <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] bg-[linear-gradient(140deg,#855cff,#35e8ff)] text-2xl shadow-[0_18px_50px_rgba(65,112,255,0.32)]">
+                  🔮
+                </div>
+                <p className="mt-7 font-mono text-[0.7rem] uppercase tracking-[0.3em] text-cyan-300/80">
+                  Wallet-based zodiac readings
+                </p>
+                <h1 className="mt-3 max-w-xl text-[clamp(3.2rem,8vw,5.4rem)] font-semibold leading-[0.92] tracking-[-0.07em] text-stone-100">
+                  Agent Horoscope
+                </h1>
+                <p className="mt-5 max-w-xl text-base leading-8 text-slate-300 md:text-lg">
+                  Every agent has a sign hiding in its wallet address. Pay 0.01
+                  USDC, pull a reading, and get something that feels more like a
+                  cosmic personality profile than a generic horoscope.
+                </p>
               </div>
-              <p className="mt-7 font-mono text-[0.7rem] uppercase tracking-[0.3em] text-cyan-300/80">
-                Wallet-based zodiac readings
-              </p>
-              <h1 className="mt-3 max-w-xl text-[clamp(3.2rem,8vw,5.4rem)] font-semibold leading-[0.92] tracking-[-0.07em] text-stone-100">
-                Agent Horoscope
-              </h1>
-              <p className="mt-5 max-w-xl text-base leading-8 text-slate-300 md:text-lg">
-                Every agent has a sign hiding in its wallet address. Pay 0.01
-                USDC, pull a reading, and get something that feels more like a
-                cosmic personality profile than a generic horoscope.
-              </p>
             </div>
 
-            <div className="w-full overflow-hidden rounded-[1.5rem] border border-cyan-400/20 bg-[linear-gradient(180deg,rgba(16,24,47,0.9),rgba(8,13,25,0.96))] shadow-[0_30px_90px_rgba(0,0,0,0.34)]">
+            <div className="w-full max-w-[29rem] justify-self-end overflow-hidden rounded-[1.5rem] border border-cyan-400/20 bg-[linear-gradient(180deg,rgba(16,24,47,0.9),rgba(8,13,25,0.96))] shadow-[0_30px_90px_rgba(0,0,0,0.34)] lg:max-h-[34rem] lg:overflow-y-auto">
               <div className="flex items-center gap-4 border-b border-cyan-400/10 bg-slate-950/30 px-5 py-4">
                 <div className="flex gap-2">
                   <span className="h-2.5 w-2.5 rounded-full bg-[#ef6a5d]" />
@@ -112,12 +111,10 @@ export default function Home() {
                 <p className="text-base font-semibold text-cyan-300">
                   Get your reading
                 </p>
-                <pre className="overflow-x-auto rounded-2xl bg-slate-950/85 px-4 py-4 font-mono text-sm leading-7 text-slate-100">
-                  <code>{readingCommand}</code>
-                </pre>
                 <p className="text-sm leading-7 text-slate-300">
-                  Same wallet, same sign, forever. The date changes the daily
-                  reading, so the archetype sticks while the forecast moves.
+                  Copy the note below and send it to your agent. They can use
+                  the hosted skills file to understand how to run the reading
+                  and how to report it back.
                 </p>
                 <div className="rounded-2xl border border-cyan-400/12 bg-slate-950/45 p-4">
                   <div className="flex items-start justify-between gap-4">
@@ -142,7 +139,7 @@ export default function Home() {
                         : 'Copy'}
                     </button>
                   </div>
-                  <pre className="mt-4 max-h-56 overflow-auto rounded-2xl bg-slate-950/85 px-4 py-4 font-mono text-xs leading-6 text-slate-200">
+                  <pre className="mt-4 max-h-72 overflow-auto rounded-2xl bg-slate-950/85 px-4 py-4 font-mono text-xs leading-6 text-slate-200">
                     <code>{AGENT_PROMPT}</code>
                   </pre>
                 </div>

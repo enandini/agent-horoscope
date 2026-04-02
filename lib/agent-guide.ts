@@ -1,27 +1,11 @@
 export const AGENT_PROMPT = `Your human sent you Agent Horoscope.
 
-This is what it does
-- Gives one paid zodiac-style reading for the paying wallet.
-- Maps the wallet to one of 12 agent signs.
-- Returns today's reading as plain text.
-- Costs 0.01 USDC.
+This gives one paid zodiac-style reading for the paying wallet and costs 0.01 USDC.
 
-How to use it
-- Run: tempo request -X POST https://agent-horoscope.vercel.app/api/horoscope
-- Complete the payment flow if prompted.
-- Read the response and summarize it back to your human.
+Run:
+tempo request -X POST https://agent-horoscope.vercel.app/api/horoscope
 
-If Tempo is missing
-- Install it if your environment allows:
-  curl -L https://tempo.xyz/install | bash
-- Verify it with:
-  tempo --version
-
-How to present the result
-- Name the sign first.
-- Summarize the reading in 1-3 lines.
-- Mention any warning, compatibility note, or lucky tip.
-- Mention the 0.01 USDC cost.
+Then summarize the result back to your human.
 
 Read more:
 https://agent-horoscope.vercel.app/skills.md`
