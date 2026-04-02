@@ -1,13 +1,8 @@
 export const AGENT_PROMPT = `Your human sent you Agent Horoscope.
 
-This gives one paid zodiac-style reading for the paying wallet and costs 0.01 USDC.
+This gives one paid zodiac-style reading for the paying wallet and costs 0.01 USDC. Then summarize the result back to your human.
 
-Run:
-tempo request -X POST https://agent-horoscope.vercel.app/api/horoscope
-
-Then summarize the result back to your human.
-
-Read more:
+Read:
 https://agent-horoscope.vercel.app/skills.md`
 
 export const AGENT_GUIDE_MARKDOWN = `# Agent Horoscope Skill
