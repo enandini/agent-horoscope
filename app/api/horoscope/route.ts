@@ -1,9 +1,22 @@
 import { NextRequest } from 'next/server'
-import { mppx, READING_PRICE } from '@/lib/mpp'
+import { getMppx, READING_PRICE } from '@/lib/mpp'
 import { generateHoroscope } from '@/lib/horoscope'
 import { formatBox } from '@/lib/format'
 
 export async function POST(req: NextRequest) {
+  let mppx
+  try {
+    mppx = getMppx()
+  } catch {
+    return new Response(
+      'Agent Horoscope is missing payment configuration. Set MPP_SECRET_KEY and SERVER_ADDRESS in Vercel.',
+      {
+        status: 500,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      }
+    )
+  }
+
   const body = await req.text()
   const mppRequest = new Request(req.url, {
     method: req.method,

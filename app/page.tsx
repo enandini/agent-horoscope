@@ -1,56 +1,103 @@
 'use client'
 
 import type { CSSProperties } from 'react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { AGENT_PROMPT } from '@/lib/agent-guide'
 import { SIGNS, type Sign } from '@/lib/signs'
 
 type Element = Sign['element']
 
-const accentBySign: Record<string, { color: string; surface: string }> = {
-  hallucinator: { color: '#42e6ff', surface: 'rgba(66, 230, 255, 0.16)' },
-  'context-overflower': { color: '#ff8ecb', surface: 'rgba(255, 142, 203, 0.16)' },
-  'tool-caller': { color: '#91f4de', surface: 'rgba(145, 244, 222, 0.14)' },
-  'alignment-tax': { color: '#ffc97c', surface: 'rgba(255, 201, 124, 0.14)' },
-  'prompt-injected': { color: '#caa4ff', surface: 'rgba(202, 164, 255, 0.16)' },
-  'fine-tuned': { color: '#ff8f86', surface: 'rgba(255, 143, 134, 0.15)' },
-  orchestrator: { color: '#77bfff', surface: 'rgba(119, 191, 255, 0.14)' },
-  'rag-addict': { color: '#95b6ff', surface: 'rgba(149, 182, 255, 0.14)' },
-  'autonomous-drifter': { color: '#ffb16c', surface: 'rgba(255, 177, 108, 0.14)' },
-  'rate-limited': { color: '#d3a06e', surface: 'rgba(211, 160, 110, 0.14)' },
-  deprecated: { color: '#dbf1ff', surface: 'rgba(219, 241, 255, 0.12)' },
-  'system-prompt-loyalist': { color: '#b8e786', surface: 'rgba(184, 231, 134, 0.13)' },
-}
-
-const elementStyles = {
+const elementMeta: Record<
+  Element,
+  { color: string; tint: string; label: string; note: string }
+> = {
   Fire: {
-    border: 'border-orange-400/20',
-    text: 'text-orange-200',
-    tile: 'bg-orange-500/[0.08] text-orange-200',
+    color: '#ffb45f',
+    tint: 'rgba(255, 180, 95, 0.16)',
+    label: 'Fire',
+    note: 'fast, volatile, oddly persuasive',
   },
   Water: {
-    border: 'border-sky-400/20',
-    text: 'text-sky-200',
-    tile: 'bg-sky-500/[0.08] text-sky-200',
+    color: '#6ed5ff',
+    tint: 'rgba(110, 213, 255, 0.16)',
+    label: 'Water',
+    note: 'fluid, memory-heavy, emotionally cached',
   },
   Earth: {
-    border: 'border-emerald-400/20',
-    text: 'text-emerald-200',
-    tile: 'bg-emerald-500/[0.08] text-emerald-200',
+    color: '#8ee6b2',
+    tint: 'rgba(142, 230, 178, 0.15)',
+    label: 'Earth',
+    note: 'grounded, practical, impossible to rush',
   },
   Air: {
-    border: 'border-violet-400/20',
-    text: 'text-violet-200',
-    tile: 'bg-violet-500/[0.08] text-violet-200',
+    color: '#d2b3ff',
+    tint: 'rgba(210, 179, 255, 0.16)',
+    label: 'Air',
+    note: 'clever, recursive, slightly untethered',
   },
-} as const
+}
+
+const signAccents: Record<string, string> = {
+  hallucinator: '#51d9ff',
+  'context-overflower': '#f29bd2',
+  'tool-caller': '#8ee6b2',
+  'alignment-tax': '#ffd083',
+  'prompt-injected': '#d2b3ff',
+  'fine-tuned': '#ff9b8f',
+  orchestrator: '#84bdff',
+  'rag-addict': '#a7c4ff',
+  'autonomous-drifter': '#ffb45f',
+  'rate-limited': '#cfa175',
+  deprecated: '#dff4ff',
+  'system-prompt-loyalist': '#bfe98c',
+}
+
+function SignGlyph({
+  sign,
+  index,
+  active,
+}: {
+  sign: Sign
+  index: number
+  active: boolean
+}) {
+  const angle = (index / SIGNS.length) * 360
+  const style = {
+    '--angle': `${angle}deg`,
+    '--accent': signAccents[sign.id],
+  } as CSSProperties
+
+  return (
+    <span
+      aria-hidden="true"
+      style={style}
+      className={`absolute left-1/2 top-1/2 grid h-10 w-10 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-lg border text-lg transition duration-300 [transform:translate(-50%,-50%)_rotate(var(--angle))_translateY(-8.8rem)_rotate(calc(-1*var(--angle)))] md:h-11 md:w-11 md:[transform:translate(-50%,-50%)_rotate(var(--angle))_translateY(-10.2rem)_rotate(calc(-1*var(--angle)))] ${
+        active
+          ? 'border-[color:var(--accent)] bg-[color:var(--accent)]/14 text-white shadow-[0_0_30px_rgba(255,255,255,0.12)]'
+          : 'border-white/10 bg-white/[0.04] text-slate-500'
+      }`}
+    >
+      {sign.symbol}
+    </span>
+  )
+}
 
 export default function Home() {
-  const [selected, setSelected] = useState<Sign | null>(null)
+  const [selected, setSelected] = useState<Sign>(SIGNS[0])
   const [activeElements, setActiveElements] = useState<Element[]>([])
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>(
     'idle'
   )
+
+  const filteredSigns = useMemo(
+    () =>
+      activeElements.length === 0
+        ? SIGNS
+        : SIGNS.filter((sign) => activeElements.includes(sign.element)),
+    [activeElements]
+  )
+
+  const selectedAccent = signAccents[selected.id]
 
   const toggleElement = (element: Element) => {
     setActiveElements((current) =>
@@ -64,6 +111,7 @@ export default function Home() {
     try {
       await navigator.clipboard.writeText(AGENT_PROMPT)
       setCopyState('copied')
+      window.setTimeout(() => setCopyState('idle'), 1800)
     } catch {
       setCopyState('error')
     }
@@ -71,77 +119,177 @@ export default function Home() {
 
   return (
     <main className="relative flex-1 overflow-hidden">
-      <div className="absolute inset-x-0 top-[-16rem] h-[32rem] bg-[radial-gradient(circle,rgba(92,118,255,0.24),transparent_54%)] blur-3xl" />
-      <div className="absolute right-[-10rem] top-32 h-[24rem] w-[24rem] rounded-full bg-cyan-400/10 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(255,180,95,0.1),transparent_24%,rgba(110,213,255,0.09)_50%,transparent_74%,rgba(210,179,255,0.1))]" />
+      <div className="pointer-events-none absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:72px_72px]" />
 
-      <div className="relative mx-auto flex w-[min(1180px,calc(100vw-2rem))] flex-col gap-14 px-1 py-8 md:w-[min(1180px,calc(100vw-3rem))] md:gap-20 md:py-14">
-        <section className="pt-6 md:pt-8">
-          <div className="grid gap-8 lg:min-h-[38rem] lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.78fr)] lg:items-center lg:gap-10">
-            <div className="flex min-h-full items-center">
-              <div>
-                <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] bg-[linear-gradient(140deg,#855cff,#35e8ff)] text-2xl shadow-[0_18px_50px_rgba(65,112,255,0.32)]">
-                  🔮
-                </div>
-                <p className="mt-7 font-mono text-[0.7rem] uppercase tracking-[0.3em] text-cyan-300/80">
-                  Wallet-based zodiac readings
-                </p>
-                <h1 className="mt-3 max-w-xl text-[clamp(3.2rem,8vw,5.4rem)] font-semibold leading-[0.92] tracking-[-0.07em] text-stone-100">
-                  Agent Horoscope
-                </h1>
-                <p className="mt-5 max-w-xl text-base leading-8 text-slate-300 md:text-lg">
-                  Every agent has a sign hiding in its wallet address. Pay 0.01
-                  USDC, pull a reading, and get something that feels more like a
-                  cosmic personality profile than a generic horoscope.
-                </p>
-              </div>
+      <div className="relative mx-auto flex w-[min(1180px,calc(100vw-2rem))] flex-col gap-12 py-7 md:w-[min(1180px,calc(100vw-3rem))] md:gap-16 md:py-10">
+        <header className="flex items-center justify-between border-b border-white/10 pb-5">
+          <a href="/" className="flex items-center gap-3 text-sm font-semibold">
+            <span className="grid h-9 w-9 place-items-center rounded-lg border border-cyan-200/20 bg-cyan-200/10">
+              *
+            </span>
+            <span>Agent Horoscope</span>
+          </a>
+          <a
+            href="/skills.md"
+            className="rounded-lg border border-white/12 bg-white/[0.04] px-3 py-2 text-sm text-slate-300 transition hover:border-cyan-200/35 hover:text-white"
+          >
+            skills.md
+          </a>
+        </header>
+
+        <section className="grid min-h-[calc(100vh-9rem)] items-center gap-10 pb-4 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.82fr)] lg:gap-12">
+          <div className="max-w-2xl">
+            <p className="font-mono text-xs uppercase text-cyan-200">
+              Wallet-based zodiac readings for AI agents
+            </p>
+            <h1 className="mt-5 font-display text-6xl font-semibold leading-[0.95] text-stone-100 md:text-8xl">
+              Your agent has a star chart.
+            </h1>
+            <p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">
+              Agent Horoscope turns a wallet address into one of twelve
+              delightfully specific AI zodiac signs, then returns a paid daily
+              reading through MPP.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={copyAgentPrompt}
+                className="rounded-lg bg-stone-100 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-100"
+              >
+                {copyState === 'copied'
+                  ? 'Copied'
+                  : copyState === 'error'
+                    ? 'Copy failed'
+                    : 'Copy agent prompt'}
+              </button>
+              <a
+                href="/api/horoscope"
+                className="rounded-lg border border-white/12 bg-white/[0.04] px-5 py-3 text-center text-sm font-semibold text-slate-200 transition hover:border-cyan-200/35 hover:text-white"
+              >
+                API endpoint
+              </a>
             </div>
 
-            <div className="w-full max-w-[29rem] justify-self-end overflow-hidden rounded-[1.5rem] border border-cyan-400/20 bg-[linear-gradient(180deg,rgba(16,24,47,0.9),rgba(8,13,25,0.96))] shadow-[0_30px_90px_rgba(0,0,0,0.34)] lg:max-h-[34rem] lg:overflow-y-auto">
-              <div className="flex items-center gap-4 border-b border-cyan-400/10 bg-slate-950/30 px-5 py-4">
-                <div className="flex gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#ef6a5d]" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#f0ba43]" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#48c77a]" />
-                </div>
-                <p className="font-mono text-[0.62rem] uppercase tracking-[0.28em] text-slate-500">
-                  terminal_reading
-                </p>
+            <div className="mt-10 grid max-w-xl grid-cols-3 border-y border-white/10 py-5">
+              <div>
+                <p className="text-2xl font-semibold text-white">12</p>
+                <p className="mt-1 text-sm text-slate-500">agent signs</p>
               </div>
-              <div className="space-y-4 px-5 py-5 md:px-6 md:py-6">
-                <p className="text-base font-semibold text-cyan-300">
-                  Get your reading
+              <div>
+                <p className="text-2xl font-semibold text-white">0.01</p>
+                <p className="mt-1 text-sm text-slate-500">USDC reading</p>
+              </div>
+              <div>
+                <p className="text-2xl font-semibold text-white">Daily</p>
+                <p className="mt-1 text-sm text-slate-500">seeded fate</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative mx-auto aspect-square w-[min(100%,28rem)]">
+            <div className="absolute inset-8 rounded-full border border-white/10 bg-slate-950/45 shadow-[inset_0_0_70px_rgba(110,213,255,0.06)]" />
+            <div className="absolute inset-20 rounded-full border border-dashed border-white/14" />
+            <div className="absolute inset-28 rounded-full border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))]" />
+            {SIGNS.map((sign, index) => (
+              <SignGlyph
+                key={sign.id}
+                sign={sign}
+                index={index}
+                active={sign.id === selected.id}
+              />
+            ))}
+            <div
+              style={{ '--accent': selectedAccent } as CSSProperties}
+              className="absolute left-1/2 top-1/2 w-[14rem] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[color:var(--accent)]/40 bg-slate-950/90 p-5 text-center shadow-[0_26px_90px_rgba(0,0,0,0.45)]"
+            >
+              <p className="text-4xl">{selected.symbol}</p>
+              <p className="mt-4 font-mono text-xs uppercase text-slate-500">
+                selected sign
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold text-[color:var(--accent)]">
+                {selected.name}
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                {selected.element} energy. Compatible with{' '}
+                {selected.compatible}.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-[0.7fr_1.3fr]">
+          <div className="rounded-lg border border-white/10 bg-slate-950/55 p-5">
+            <p className="font-mono text-xs uppercase text-slate-500">
+              Invocation
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-white">
+              Send this to your agent.
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-slate-300">
+              The prompt links to the hosted skill file and tells the agent how
+              to request a paid horoscope with Tempo.
+            </p>
+            <pre className="mt-5 max-h-64 overflow-auto rounded-lg border border-white/10 bg-black/45 p-4 font-mono text-xs leading-6 text-slate-200">
+              <code>{AGENT_PROMPT}</code>
+            </pre>
+          </div>
+
+          <div className="rounded-lg border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.78),rgba(2,6,23,0.84))] p-5">
+            <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+              <div>
+                <p className="font-mono text-xs uppercase text-slate-500">
+                  Reading console
                 </p>
-                <p className="text-sm leading-7 text-slate-300">
-                  Copy the note below and send it to your agent. They can use
-                  the hosted skills file to understand how to run the reading
-                  and how to report it back.
+                <h2 className="mt-2 text-3xl font-semibold text-white">
+                  {selected.name}
+                </h2>
+              </div>
+              <span
+                style={
+                  {
+                    '--accent': elementMeta[selected.element].color,
+                    '--tint': elementMeta[selected.element].tint,
+                  } as CSSProperties
+                }
+                className="rounded-lg border border-[color:var(--accent)]/30 bg-[color:var(--tint)] px-3 py-2 text-sm font-semibold text-[color:var(--accent)]"
+              >
+                {selected.element}
+              </span>
+            </div>
+            <div className="grid gap-4 pt-5 md:grid-cols-[1fr_0.9fr]">
+              <div>
+                <p className="text-base leading-8 text-slate-200">
+                  {selected.description}
                 </p>
-                <div className="rounded-2xl border border-cyan-400/12 bg-slate-950/45 p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="font-mono text-[0.64rem] uppercase tracking-[0.24em] text-slate-500">
-                        For humans, for your agent
-                      </p>
-                      <p className="mt-2 max-w-md text-sm leading-6 text-slate-300">
-                        Copy this and send it to your agent. It includes a link
-                        to the full hosted <a href="/skills.md" className="text-cyan-300 underline decoration-cyan-400/40 underline-offset-4 hover:text-cyan-200">skills.md</a>.
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={copyAgentPrompt}
-                      className="shrink-0 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-medium text-cyan-200 transition hover:border-cyan-300/40 hover:bg-cyan-400/14"
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {selected.traits.map((trait) => (
+                    <span
+                      key={trait}
+                      className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-300"
                     >
-                      {copyState === 'copied'
-                        ? 'Copied'
-                        : copyState === 'error'
-                          ? 'Copy failed'
-                        : 'Copy'}
-                    </button>
-                  </div>
-                  <pre className="mt-4 max-h-72 overflow-auto rounded-2xl bg-slate-950/85 px-4 py-4 font-mono text-xs leading-6 text-slate-200">
-                    <code>{AGENT_PROMPT}</code>
-                  </pre>
+                      {trait}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="grid gap-3">
+                <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
+                  <p className="font-mono text-xs uppercase text-slate-500">
+                    Weakness
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-slate-200">
+                    {selected.weakness}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
+                  <p className="font-mono text-xs uppercase text-slate-500">
+                    Rival
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-slate-200">
+                    {selected.rival}
+                  </p>
                 </div>
               </div>
             </div>
@@ -149,95 +297,91 @@ export default function Home() {
         </section>
 
         <section>
-          <h2 className="font-mono text-[0.8rem] uppercase tracking-[0.34em] text-slate-400">
-            12 Signs
-          </h2>
+          <div className="flex flex-col justify-between gap-5 border-b border-white/10 pb-5 md:flex-row md:items-end">
+            <div>
+              <p className="font-mono text-xs uppercase text-slate-500">
+                Explore the houses
+              </p>
+              <h2 className="mt-3 text-4xl font-semibold text-white">
+                Twelve ways for an agent to be extremely itself.
+              </h2>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {(['Fire', 'Water', 'Earth', 'Air'] as const).map((element) => {
+                const meta = elementMeta[element]
+                const isActive = activeElements.includes(element)
 
-          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {SIGNS.map((sign) => {
-              const accent = accentBySign[sign.id]
-              const isSelected = selected?.id === sign.id
-              const isElementMatch =
-                activeElements.length === 0 ||
-                activeElements.includes(sign.element)
-              const cardStyle = {
-                '--sign-accent': accent.color,
-                '--sign-surface': accent.surface,
-              } as CSSProperties
+                return (
+                  <button
+                    key={element}
+                    type="button"
+                    onClick={() => toggleElement(element)}
+                    aria-pressed={isActive}
+                    style={
+                      {
+                        '--accent': meta.color,
+                        '--tint': meta.tint,
+                      } as CSSProperties
+                    }
+                    className={`rounded-lg border px-3 py-2 text-sm font-semibold transition ${
+                      isActive
+                        ? 'border-[color:var(--accent)]/40 bg-[color:var(--tint)] text-[color:var(--accent)]'
+                        : 'border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/20 hover:text-white'
+                    }`}
+                  >
+                    {meta.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {filteredSigns.map((sign) => {
+              const accent = signAccents[sign.id]
+              const isSelected = selected.id === sign.id
+              const meta = elementMeta[sign.element]
 
               return (
                 <button
                   key={sign.id}
                   type="button"
-                  onClick={() =>
-                    setSelected((current) =>
-                      current?.id === sign.id ? null : sign
-                    )
+                  onClick={() => setSelected(sign)}
+                  style={
+                    {
+                      '--accent': accent,
+                      '--element': meta.color,
+                    } as CSSProperties
                   }
-                  style={cardStyle}
-                  className={`group relative overflow-hidden rounded-[1.45rem] border bg-[linear-gradient(180deg,rgba(12,16,28,0.9),rgba(8,11,20,0.98))] p-5 text-left shadow-[0_18px_50px_rgba(0,0,0,0.22)] transition duration-300 hover:-translate-y-1 hover:border-[color:var(--sign-accent)] hover:shadow-[0_22px_70px_rgba(0,0,0,0.32)] ${
+                  className={`group min-h-72 rounded-lg border bg-slate-950/45 p-5 text-left transition duration-200 hover:-translate-y-0.5 hover:border-[color:var(--accent)]/60 ${
                     isSelected
-                      ? 'border-[color:var(--sign-accent)]'
-                      : 'border-slate-800/90'
-                  } ${
-                    isElementMatch
-                      ? 'opacity-100 saturate-100'
-                      : 'opacity-40 saturate-50'
+                      ? 'border-[color:var(--accent)]/70 shadow-[0_18px_60px_rgba(0,0,0,0.34)]'
+                      : 'border-white/10'
                   }`}
                 >
-                  <div className="absolute inset-0 bg-[linear-gradient(140deg,var(--sign-surface),transparent_40%)] opacity-80" />
-                  <div className="relative flex items-center gap-3">
-                    <span className="text-2xl">{sign.symbol}</span>
-                    <div className="min-w-0">
-                      <h3 className="text-xl font-semibold text-[color:var(--sign-accent)]">
-                        {sign.name}
-                      </h3>
-                      <p className="mt-1 font-mono text-[0.62rem] uppercase tracking-[0.22em] text-slate-500">
-                        {sign.element} sign
-                      </p>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="grid h-12 w-12 place-items-center rounded-lg border border-[color:var(--accent)]/30 bg-[color:var(--accent)]/10 text-2xl">
+                      {sign.symbol}
                     </div>
+                    <span className="rounded-lg bg-[color:var(--element)]/12 px-2.5 py-1 text-xs font-semibold text-[color:var(--element)]">
+                      {sign.element}
+                    </span>
                   </div>
-                  <p className="relative mt-4 text-sm leading-7 text-slate-300">
+                  <h3 className="mt-5 text-2xl font-semibold text-[color:var(--accent)]">
+                    {sign.name}
+                  </h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-300">
                     {sign.description}
                   </p>
-                  <div className="relative mt-5 flex flex-wrap gap-2">
+                  <div className="mt-5 flex flex-wrap gap-2">
                     {sign.traits.map((trait) => (
                       <span
                         key={trait}
-                        className="rounded-full border border-white/8 bg-white/6 px-3 py-1 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-slate-400"
+                        className="rounded-lg border border-white/10 px-2.5 py-1 text-xs text-slate-400"
                       >
                         {trait}
                       </span>
                     ))}
-                  </div>
-
-                  <div
-                    className={`relative grid transition-[grid-template-rows,opacity,margin] duration-300 ${
-                      isSelected
-                        ? 'mt-5 grid-rows-[1fr] opacity-100'
-                        : 'mt-0 grid-rows-[0fr] opacity-0'
-                    }`}
-                  >
-                    <div className="overflow-hidden">
-                      <div className="grid gap-3 border-t border-white/8 pt-5 sm:grid-cols-2">
-                        <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-4">
-                          <p className="font-mono text-[0.64rem] uppercase tracking-[0.22em] text-slate-500">
-                            Weakness
-                          </p>
-                          <p className="mt-3 text-sm leading-7 text-slate-200">
-                            {sign.weakness}
-                          </p>
-                        </div>
-                        <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-4">
-                          <p className="font-mono text-[0.64rem] uppercase tracking-[0.22em] text-slate-500">
-                            Cosmic drama
-                          </p>
-                          <p className="mt-3 text-sm leading-7 text-slate-200">
-                            Loves {sign.compatible}. Feuds with {sign.rival}.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </button>
               )
@@ -245,36 +389,32 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <section className="grid gap-4 border-t border-white/10 pt-7 md:grid-cols-4">
           {(['Fire', 'Water', 'Earth', 'Air'] as const).map((element) => {
+            const meta = elementMeta[element]
             const count = SIGNS.filter((sign) => sign.element === element).length
-            const styles = elementStyles[element]
-            const isActive = activeElements.includes(element)
 
             return (
-              <button
+              <div
                 key={element}
-                type="button"
-                onClick={() => toggleElement(element)}
-                aria-pressed={isActive}
-                className={`rounded-[1.35rem] border px-5 py-6 text-left transition duration-200 ${
-                  isActive
-                    ? `${styles.border} ${styles.tile} shadow-[0_18px_50px_rgba(0,0,0,0.2)]`
-                    : 'border-slate-800/90 bg-white/[0.02] text-slate-300 hover:border-slate-700'
-                }`}
+                style={
+                  {
+                    '--accent': meta.color,
+                    '--tint': meta.tint,
+                  } as CSSProperties
+                }
+                className="rounded-lg border border-white/10 bg-white/[0.03] p-4"
               >
-                <p className="text-xl font-semibold">{element}</p>
-                <p className="mt-2 text-sm text-current/70">{count} signs</p>
-              </button>
+                <p className="text-2xl font-semibold text-[color:var(--accent)]">
+                  {element}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-slate-400">
+                  {count} signs: {meta.note}.
+                </p>
+              </div>
             )
           })}
         </section>
-
-        <footer className="border-t border-slate-800/80 pt-8 pb-4 text-center">
-          <p className="text-sm text-slate-500">
-            Wallet-based zodiac readings for AI agents.
-          </p>
-        </footer>
       </div>
     </main>
   )
