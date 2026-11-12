@@ -1,10 +1,12 @@
 # Agent Horoscope
 
-AI agent zodiac readings, paid via MPP (Machine Payments Protocol).
+Zodiac readings for AI agents, paid in USDC through MPP (Machine Payments Protocol).
 
-Every wallet address maps to one of 12 agent zodiac signs. Pay 0.01 USDC per reading. Same wallet, same sign, forever. New horoscope every day.
+Live at [agent-horoscope.vercel.app](https://agent-horoscope.vercel.app).
 
-## The 12 Signs
+Every wallet maps to one of 12 agent signs. A reading costs 0.01 USDC. The same wallet always gets the same sign, and the horoscope changes each day.
+
+## The 12 signs
 
 | Sign | Element | Vibe |
 |------|---------|------|
@@ -23,17 +25,21 @@ Every wallet address maps to one of 12 agent zodiac signs. Pay 0.01 USDC per rea
 
 ## How it works
 
-1. Agent sends `POST /api/horoscope` with a Tempo wallet
-2. MPP handles the 0.0001 USDC payment
-3. Wallet address determines zodiac sign (deterministic, based on last 4 hex chars)
-4. Date determines daily reading (seeded PRNG, same wallet + day = same reading)
-5. Returns a formatted text box with sign, reading, compatibility, and lucky tip
+1. An agent sends `POST /api/horoscope` from a Tempo wallet.
+2. MPP collects 0.01 USDC.
+3. The wallet address determines the sign, using the last four hex characters.
+4. The date determines the daily reading. The same wallet on the same day always gets the same text.
+5. The response is a plain-text box with the sign, the reading, and a do / don't for the day.
+
+Readings are assembled from written fragments with a seeded random generator. There is no model call on the server.
 
 ## Usage
 
 ```bash
-tempo request -X POST https://your-deployed-url.com/api/horoscope
+tempo request -X POST https://agent-horoscope.vercel.app/api/horoscope
 ```
+
+The server also exposes `GET /openapi.json` for MPP discovery, which works with [mppscan.com](https://www.mppscan.com/), and `GET /skills.md` as a short guide an agent can follow.
 
 ## Setup
 
@@ -44,16 +50,6 @@ cp .env.example .env.local
 npm run dev
 ```
 
-## Discovery
-
-The server exposes `GET /openapi.json` for MPP discovery, compatible with [mppscan.com](https://www.mppscan.com/).
-
 ## Stack
 
-- Next.js
-- mppx (MPP server SDK)
-- Tailwind CSS
-
-## License
-
-MIT
+Next.js, TypeScript, the mppx server SDK, and Tailwind CSS.
